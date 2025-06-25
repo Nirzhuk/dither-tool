@@ -1,7 +1,6 @@
 'use client'
 
 import { useDitherStore } from '@/lib/store'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { AlgorithmSelector } from './options-panel/algorithm-selector'
 import { SliderControl } from './options-panel/slider-control'

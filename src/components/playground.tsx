@@ -79,7 +79,7 @@ export function Playground({ onImageLoaded, onDitheredImage }: { onImageLoaded?:
     if (originalImage) {
       debouncedApplyDither(originalImage)
     }
-  }, [originalImage, effectsEnabled, debouncedApplyDither])
+  }, [originalImage, debouncedApplyDither])
 
   useEffect(() => {
     if (onImageLoaded) onImageLoaded(!!originalImage)
@@ -141,6 +141,7 @@ export function Playground({ onImageLoaded, onDitheredImage }: { onImageLoaded?:
         {/* Removed upload button and file input, only drag-and-drop is allowed */}
         {/* Dithered Image Display with Drag-and-Drop and Click-to-Upload */}
         <div
+          role="button"
           ref={dropAreaRef}
           className={`flex-1 flex items-center justify-center min-h-0 min-w-0 overflow-hidden relative cursor-pointer ${dragActive ? 'rounded-lg ring-4 ring-primary/60' : ''}`}
           onDragOver={handleDragOver}
@@ -153,7 +154,6 @@ export function Playground({ onImageLoaded, onDitheredImage }: { onImageLoaded?:
             }
           }}
           tabIndex={0}
-          role="button"
           aria-label="Click or drag to upload image"
         >
           {dragActive && (

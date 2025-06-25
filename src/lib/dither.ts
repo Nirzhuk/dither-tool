@@ -20,9 +20,6 @@ export function applyDither(
   let { width, height, data } = imageData
   let newData = new Uint8ClampedArray(data)
   
-  console.log('Starting dither with options:', options)
-  console.log('Image dimensions:', width, 'x', height)
-  
   // Exposure adjustment (applied first)
   if (options.exposure !== 0) {
     const exposureFactor = Math.pow(2, options.exposure / 100) // Convert to EV scale
@@ -137,7 +134,6 @@ export function applyDither(
       result = floydSteinberg(newData, width, height, options)
   }
   
-  console.log('Dither algorithm completed:', options.algorithm)
   return result
 }
 
