@@ -14,6 +14,7 @@ export interface DitherOptions {
   midtones: number
   noise: number
   glow: number
+  exposure: number
 }
 
 interface DitherStore {
@@ -35,9 +36,8 @@ const defaultOptions: DitherOptions = {
   midtones: 1.0,
   noise: 0,
   glow: 0,
+  exposure: 0,
 }
-
-
 
 export const useDitherStore = create<DitherStore>((set) => ({
   options: defaultOptions,
@@ -60,6 +60,7 @@ export const useDitherStore = create<DitherStore>((set) => ({
       midtones: +(Math.random() * 2).toFixed(2), // 0-2
       noise: Math.floor(Math.random() * 101), // 0-100
       glow: Math.floor(Math.random() * 101), // 0-100
+      exposure: Math.floor(Math.random() * 101), // 0-100
     }
   }
   }),

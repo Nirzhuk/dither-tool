@@ -24,14 +24,8 @@ export function OptionsPanel({ disabled = false, ditheredImage }: OptionsPanelPr
           
         </div>
       )}
-      
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 pt-4">
-          Dither Options
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
+
+      <div className="space-y-6 h-full flex flex-col p-2">
         {/* Algorithm Selection */}
         <AlgorithmSelector
           value={options.algorithm}
@@ -41,67 +35,80 @@ export function OptionsPanel({ disabled = false, ditheredImage }: OptionsPanelPr
         
         <Separator />
         
-        {/* Pixelation Scale */}
-        <SliderControl
-          label="Pixelation Scale"
-          value={options.pixelationScale}
-          onChange={(value) => setOption('pixelationScale', value)}
-          min={1}
-          max={50}
-          disabled={disabled}
-        />
-        
-        {/* Detail Enhancement */}
-        <SliderControl
-          label="Detail Enhancement"
-          value={options.detailEnhancement}
-          onChange={(value) => setOption('detailEnhancement', value)}
-          min={0}
-          max={10}
-          disabled={disabled}
-        />
-        
-        {/* Brightness */}
-        <SliderControl
-          label="Brightness"
-          value={options.brightness}
-          onChange={(value) => setOption('brightness', value)}
-          min={-100}
-          max={100}
-          disabled={disabled}
-        />
-        
-        {/* Midtones */}
-        <SliderControl
-          label="Midtones"
-          value={options.midtones}
-          onChange={(value) => setOption('midtones', value)}
-          min={0}
-          max={2}
-          step={0.01}
-          disabled={disabled}
-          formatValue={(value) => value.toFixed(2)}
-        />
-        
-        {/* Noise */}
-        <SliderControl
-          label="Noise"
-          value={options.noise}
-          onChange={(value) => setOption('noise', value)}
-          min={0}
-          max={100}
-          disabled={disabled}
-        />
-        
-        {/* Glow */}
-        <SliderControl
-          label="Glow"
-          value={options.glow}
-          onChange={(value) => setOption('glow', value)}
-          min={0}
-          max={100}
-          disabled={disabled}
-        />
+        {/* Scrollable Sliders Section */}
+        <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-400px)] pr-2">
+          {/* Exposure */}
+          <SliderControl
+            label="Exposure"
+            value={options.exposure}
+            onChange={(value) => setOption('exposure', value)}
+            min={-100}
+            max={100}
+            disabled={disabled}
+          />
+          
+          {/* Pixelation Scale */}
+          <SliderControl
+            label="Pixelation Scale"
+            value={options.pixelationScale}
+            onChange={(value) => setOption('pixelationScale', value)}
+            min={1}
+            max={50}
+            disabled={disabled}
+          />
+          
+          {/* Detail Enhancement */}
+          <SliderControl
+            label="Detail Enhancement"
+            value={options.detailEnhancement}
+            onChange={(value) => setOption('detailEnhancement', value)}
+            min={0}
+            max={10}
+            disabled={disabled}
+          />
+          
+          {/* Brightness */}
+          <SliderControl
+            label="Brightness"
+            value={options.brightness}
+            onChange={(value) => setOption('brightness', value)}
+            min={-100}
+            max={100}
+            disabled={disabled}
+          />
+          
+          {/* Midtones */}
+          <SliderControl
+            label="Midtones"
+            value={options.midtones}
+            onChange={(value) => setOption('midtones', value)}
+            min={0}
+            max={2}
+            step={0.01}
+            disabled={disabled}
+            formatValue={(value) => value.toFixed(2)}
+          />
+          
+          {/* Noise */}
+          <SliderControl
+            label="Noise"
+            value={options.noise}
+            onChange={(value) => setOption('noise', value)}
+            min={0}
+            max={100}
+            disabled={disabled}
+          />
+          
+          {/* Glow */}
+          <SliderControl
+            label="Glow"
+            value={options.glow}
+            onChange={(value) => setOption('glow', value)}
+            min={0}
+            max={100}
+            disabled={disabled}
+          />
+        </div>
         
         <Separator />
         
@@ -124,7 +131,7 @@ export function OptionsPanel({ disabled = false, ditheredImage }: OptionsPanelPr
           onRandomize={randomizeOptions}
           disabled={disabled}
         />
-      </CardContent>
+      </div>
     </div>
   )
 } 

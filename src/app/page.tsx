@@ -10,13 +10,13 @@ export default function Home() {
   return (
     <div className="overflow-hidden bg-background p-2">
       {/* Main Content */}
-      <div className="h-[calc(100vh-16px)]  grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
+      <div className="min-h-[calc(100vh-16px)]  grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
         {/* Playground Section */}
-        <div className="order-2 lg:order-1">
+        <div className="order-1">
           <Playground onImageLoaded={setImageLoaded} onDitheredImage={setDitheredImage} />
         </div>
         {/* Options Section */}
-        <div className="order-1 lg:order-2">
+        <div className="order-2">
           <OptionsPanel disabled={!imageLoaded} ditheredImage={ditheredImage} />
         </div>
       </div>

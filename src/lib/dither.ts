@@ -10,6 +10,7 @@ export interface DitherOptions {
   midtones: number
   noise: number
   glow: number
+  exposure: number
 }
 
 export function applyDither(
@@ -22,58 +23,35 @@ export function applyDither(
   console.log('Starting dither with options:', options)
   console.log('Image dimensions:', width, 'x', height)
   
+  // Exposure adjustment (applied first)
+  if (options.exposure !== 0) {
+    const exposureFactor = Math.pow(2, options.exposure / 100) // Convert to EV scale
+    for (let i = 0; i < newData.length; i += 4) {
+      newData[i] = clamp(newData[i] * exposureFactor)
+      newData[i + 1] = clamp(newData[i + 1] * exposureFactor)
+      newData[i + 2] = clamp(newData[i + 2] * exposureFactor)
+    }
+  }
+  
   // Pixelation
   if (options.pixelationScale > 1) {
     const scale = options.pixelationScale
     const tempCanvas = document.createElement('canvas')
-    
-    // For very large scales, we need to be more careful about minimum dimensions
-    const scaledWidth = Math.max(1, Math.floor(width / scale))
-    const scaledHeight = Math.max(1, Math.floor(height / scale))
-    
-    tempCanvas.width = scaledWidth
-    tempCanvas.height = scaledHeight
+    tempCanvas.width = Math.max(1, Math.floor(width / scale))
+    tempCanvas.height = Math.max(1, Math.floor(height / scale))
     const tempCtx = tempCanvas.getContext('2d')
     if (!tempCtx) throw new Error('Could not get 2d context for tempCanvas')
-    
     const srcCanvas = document.createElement('canvas')
     srcCanvas.width = width
     srcCanvas.height = height
     const srcCtx = srcCanvas.getContext('2d')
     if (!srcCtx) throw new Error('Could not get 2d context for srcCanvas')
-    
-    // Put the current image data onto the source canvas
     srcCtx.putImageData(new ImageData(newData, width, height), 0, 0)
-    
-    // For very large scales, use a more sophisticated downsampling approach
-    if (scale > 20) {
-      // Use a more aggressive downsampling for extreme pixelation
-      const aggressiveScale = Math.min(scale, 50) // Cap at 50x for performance
-      const aggressiveWidth = Math.max(1, Math.floor(width / aggressiveScale))
-      const aggressiveHeight = Math.max(1, Math.floor(height / aggressiveScale))
-      
-      // Create an intermediate canvas for aggressive downsampling
-      const intermediateCanvas = document.createElement('canvas')
-      intermediateCanvas.width = aggressiveWidth
-      intermediateCanvas.height = aggressiveHeight
-      const intermediateCtx = intermediateCanvas.getContext('2d')
-      if (!intermediateCtx) throw new Error('Could not get 2d context for intermediateCanvas')
-      
-      // Downscale aggressively
-      intermediateCtx.drawImage(srcCanvas, 0, 0, aggressiveWidth, aggressiveHeight)
-      
-      // Then upscale to the target size
-      tempCtx.imageSmoothingEnabled = false
-      tempCtx.drawImage(intermediateCanvas, 0, 0, scaledWidth, scaledHeight)
-    } else {
-      // Standard downsampling for moderate scales
-      tempCtx.drawImage(srcCanvas, 0, 0, scaledWidth, scaledHeight)
-    }
-    
-    // Upscale back to original size with crisp edges
+    // Downscale
+    tempCtx.drawImage(srcCanvas, 0, 0, tempCanvas.width, tempCanvas.height)
+    // Upscale
     srcCtx.imageSmoothingEnabled = false
     srcCtx.drawImage(tempCanvas, 0, 0, width, height)
-    
     const imageData = srcCtx.getImageData(0, 0, width, height)
     newData = new Uint8ClampedArray(imageData.data)
   }
@@ -107,14 +85,20 @@ export function applyDither(
     }
   }
 
-  // Detail Enhancement (sharpen kernel)
+  // Detail Enhancement (sharpen kernel) - Optimized for large images
   if (options.detailEnhancement > 0) {
-    newData = new Uint8ClampedArray(applySharpen(newData, width, height, options.detailEnhancement))
+    const totalPixels = width * height
+    // For very large images, reduce detail enhancement intensity
+    const adjustedAmount = totalPixels > 2000000 ? options.detailEnhancement * 0.5 : options.detailEnhancement
+    newData = new Uint8ClampedArray(applySharpen(newData, width, height, adjustedAmount))
   }
 
-  // Glow (blur + blend)
+  // Glow (blur + blend) - Optimized for large images
   if (options.glow > 0) {
-    newData = new Uint8ClampedArray(applyGlow(newData, width, height, options.glow))
+    const totalPixels = width * height
+    // For very large images, reduce glow intensity
+    const adjustedAmount = totalPixels > 2000000 ? options.glow * 0.5 : options.glow
+    newData = new Uint8ClampedArray(applyGlow(newData, width, height, adjustedAmount))
   }
 
   // Always convert to grayscale before dithering
@@ -469,7 +453,7 @@ function stucki(
 }
 
 function bayerDither(data: Uint8ClampedArray, width: number, height: number, options: DitherOptions): ImageData {
-  // 8x8 Bayer matrix
+  // 8x8 Bayer matrix for ordered dithering
   const bayerMatrix = [
     [0, 48, 12, 60, 3, 51, 15, 63],
     [32, 16, 44, 28, 35, 19, 47, 31],
@@ -483,22 +467,22 @@ function bayerDither(data: Uint8ClampedArray, width: number, height: number, opt
   const matrixSize = 8
   const matrixScale = 64 // 8x8 matrix, values 0-63
   const out = new Uint8ClampedArray(data.length)
+  
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const idx = (y * width + x) * 4
+      const matrixValue = bayerMatrix[y % matrixSize][x % matrixSize]
+      const threshold = (matrixValue + 0.5) * 255 / matrixScale
+      
       for (let c = 0; c < 3; c++) {
         const value = data[idx + c]
-        const threshold = (bayerMatrix[y % matrixSize][x % matrixSize] + 0.5) * 255 / matrixScale
-        // Quantize using palette size
-        const paletteSize = options.paletteSize
-        const step = 255 / (paletteSize - 1)
-        let quantized = Math.floor((value + threshold - 128) / step)
-        quantized = Math.max(0, Math.min(paletteSize - 1, quantized))
-        out[idx + c] = quantized * step
+        // Simple threshold comparison for ordered dithering
+        out[idx + c] = value > threshold ? 255 : 0
       }
-      out[idx + 3] = data[idx + 3]
+      out[idx + 3] = data[idx + 3] // Preserve alpha
     }
   }
+  
   return new ImageData(out, width, height)
 }
 

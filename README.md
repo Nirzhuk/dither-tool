@@ -19,6 +19,7 @@ A modern, interactive web application for creating stunning dithered images with
 - **Bayer (Ordered)** - Pattern-based dithering
 
 ### 🎨 **Real-time Image Processing**
+- **Exposure Control** - Adjust exposure (-100 to +100 EV)
 - **Pixelation Control** - Scale from 1x to 50x
 - **Detail Enhancement** - Sharpen details (0-10)
 - **Brightness Adjustment** - -100 to +100 range
@@ -110,6 +111,7 @@ pnpm start
 
 2. **Adjust Settings**
    - **Algorithm**: Choose your preferred dithering method
+   - **Exposure**: Adjust exposure levels (-100 to +100 EV)
    - **Pixelation**: Control the level of pixelation (1-50)
    - **Detail Enhancement**: Sharpen or soften details (0-10)
    - **Brightness**: Adjust overall brightness (-100 to +100)
