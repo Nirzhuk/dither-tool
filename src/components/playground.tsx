@@ -176,10 +176,9 @@ export function Playground({ onImageLoaded, onDitheredImage }: { onImageLoaded?:
                 <img
                   src={effectsEnabled ? ditheredImage || originalImage : originalImage}
                   alt={effectsEnabled ? "Dithered" : "Original"}
-                  className="rounded-2xl object-contain"
+                  className="rounded-2xl object-contain size-[calc(100vh-100px)] "
                   style={{ display: 'block' }}
-                  height={800}
-                  width={900}
+                  
                 />
               ) : (
                 <div className="text-center text-gray-500">
